@@ -1,0 +1,17 @@
+{
+	"name": "cdn",
+	"version": "1.0.0",
+	"description": "A simple and minimalistic CDN.",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js",
+		"install": "npm i express formidable @codedipper/random-code@1.0.2 --save-prod"
+	},
+	"author": "Revvy",
+	"license": "MIT",
+	"dependencies": {
+		"@codedipper/random-code": "^1.0.2",
+		"express": "^4.17.1",
+		"formidable": "^1.2.2"
+	}
+}
