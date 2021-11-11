@@ -113,24 +113,26 @@ app.post("/send", (req, res) => {
 		}
 
 		let code = gencode(filelength);
-		let fn = files.file.name;
+		let nf = `${code}.${files.file.name.split(".")[1] || ""}`;
 
-		if (existsSync(`./files/${code}`)){
+		if (existsSync(`./files/${nf}`)){
 			code = gencode(filelength);
 
-			if (existsSync(`./files/${code}`)){
+			if (existsSync(`./files/${nf}`)){
 				code = gencode(filelength);
 				
-				if (existsSync(`./files/${code}`)) code = gencode(filelength);
+				if (existsSync(`./files/${nf}`)){
+					code = gencode(filelength);
+				}
 			}
 		}
 
 		writeFileSync(
-			`./files/${code}.${fn.split(".")[1] || ""}`,
+			`./files/${nf}`	,
 			readFileSync(files.file.path)
 		);
 
-		res.write("<p>Success!</p>");
+		res.write(`<p>Success! Written to <a href=\"./${nf}\">${nf}</a>.</p>`);
 		res.write("<a href=\"/\">Go back to home.</a>");
 		res.end();
 	});
