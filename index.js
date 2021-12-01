@@ -136,7 +136,12 @@ app.post("/send", (req, res) => {
 
 		let code = gencode(filelength);
 		let ext = files.file.name.split(".");
-		nf += `${code}.${ext[ext.length - 1] || ""}`;
+		
+		if (ext.length == 1){
+			nf += `${code}.${ext[ext.length] || ""}`;
+		} else {
+			nf += `${code}.${ext[ext.length - 1] || ""}`;
+		}
 
 		if (existsSync(`./files/${nf}`)){
 			code = gencode(filelength);
