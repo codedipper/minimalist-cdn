@@ -1,3 +1,5 @@
 exports.port = Port;
 exports.pswd = "YourPassword";
-exports.filelength = "Length of randomly generated name.";
+exports.filelength = 32;
+exports.hiddenenabled = true;
+

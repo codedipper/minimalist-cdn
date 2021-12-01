@@ -1,4 +1,4 @@
-const { port, pswd, filelength } = require("./config");
+const { port, pswd, filelength, hiddenenabled } = require("./config");
 const gencode = require("@codedipper/random-code");
 const { IncomingForm } = require("formidable");
 const express = require("express");
@@ -18,6 +18,8 @@ app.get("/", (req, res) => {
 	let fs = "";
 
 	for (let i = 0; i < files.length; i++) {
+		if (files[i].startsWith("_")) continue;
+		
 		fs += `<a href="${files[i]}">/${files[i]}</a><br>`;
 	}
 
@@ -28,13 +30,26 @@ app.get("/", (req, res) => {
 });
 
 app.get("/upload", (req, res) => {
-	res.send(`
-    <form action="/send" method="post" enctype="multipart/form-data">
-        <input type="file" name="file"><br>
-        <input type="password" name="password" placeholder="Password">
-        <input type="submit">
-    </form>
-    `);
+	if (hiddenenabled){
+		res.send(`
+		<form action="/send" method="post" enctype="multipart/form-data">
+		    <input type="file" name="file"><br>
+		    <input type="password" name="password" placeholder="Password"><br>
+		    <label>Hidden</label>
+		    <input type="checkbox" name="hidden" value="Hidden"><br><br>
+		    <input type="submit">
+		</form>
+		`);
+    } else {
+    	res.send(`
+		<form action="/send" method="post" enctype="multipart/form-data">
+		    <input type="file" name="file"><br>
+		    <input type="password" name="password" placeholder="Password"><br><br>
+		    <input type="submit">
+		</form>
+		`);
+    }
+    
 	res.end();
 });
 
@@ -43,7 +58,7 @@ app.get("/delete", (req, res) => {
     <form action="/remove" method="post">
         <input type="text" name="filename" placeholder="File Name"><br>
 		<input type="password" name="password" placeholder="Password">
-        <input type="submit">
+        <input type="submit"><br><br>
     </form>
     `);
 	res.end();
@@ -93,6 +108,9 @@ app.post("/send", (req, res) => {
 	const form = new IncomingForm();
 
 	form.parse(req, (err, fields, files) => {
+		let hidden = false;
+		let nf = "";
+		
 		if (err) {
 			res.status(500).send("Internal Server Error");
 			return;
@@ -111,9 +129,14 @@ app.post("/send", (req, res) => {
 			res.end();
 			return;
 		}
+		
+		if (fields.hidden == "Hidden"){
+			nf = "_";	
+		}
 
 		let code = gencode(filelength);
-		let nf = `${code}.${files.file.name.split(".")[1] || ""}`;
+		let ext = files.file.name.split(".");
+		nf += `${code}.${ext[ext.length - 1] || ""}`;
 
 		if (existsSync(`./files/${nf}`)){
 			code = gencode(filelength);
@@ -139,3 +162,4 @@ app.post("/send", (req, res) => {
 });
 
 app.listen(parseInt(port), console.log("Working!"));
+
